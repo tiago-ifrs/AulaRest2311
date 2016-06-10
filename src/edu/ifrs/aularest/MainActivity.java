@@ -1,5 +1,6 @@
 package edu.ifrs.aularest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +20,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,12 +29,18 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends Activity {
-	
+
 	// http://developer.android.com/tools/devices/emulator.html#networkaddresses
-	private static String SERVICO = "http://10.0.2.2:8080/AulaRest2311servico/rest/teste/nome"; 
-	
-	private String nome;
+	//private static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
+	private static String SERVICE_RAIZ = "http://177.18.128.209:8080/ServicoEnvioMysql/webresources/";
+	private static String SERVICE_LEITURA = SERVICE_RAIZ + "entidades.leitura";
+	private static String SERVICE_DADO = SERVICE_RAIZ + "entidades.dado";
+
+	private String leitura;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +53,17 @@ public class MainActivity extends Activity {
 		final EditText campo = (EditText) this.findViewById(R.id.edtNome);
 		if(campo != null) {
 			
-			this.nome = campo.getText().toString();
+			leitura = campo.getText().toString();
 		}
 		
-		if(this.nome != null) {
+		if(leitura != null) {
 			
 			final ConnectivityManager cmgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 			final NetworkInfo netinfo = cmgr.getActiveNetworkInfo();
 			
 			if(netinfo != null && netinfo.isConnected()) {
 				
-				new AcessoRestTask().execute(SERVICO, this.nome);
+				new AcessoRestTask().execute(SERVICE_LEITURA, leitura);
 				
 			} else {
 				
@@ -119,26 +127,29 @@ public class MainActivity extends Activity {
 			try {
 				final URL url = new URL(servico);
 				final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
 //				conn.setReadTimeout(10000 /* milliseconds */);
 //		        conn.setConnectTimeout(15000 /* milliseconds */);
 //		        conn.setRequestMethod("POST");
-//		        conn.setDoInput(true);
-		        conn.setDoOutput(true);
+		        conn.setDoInput(true);
+//		        conn.setDoOutput(true);
 		        conn.setChunkedStreamingMode(0);
 
 		        conn.connect();
 		        
-		        os = conn.getOutputStream();
-		        this.writeOut(os, "user=" + nome);
+//		        os = conn.getOutputStream();
+//		        this.writeOut(os, "user=" + nome);
 		        
 		        is = conn.getInputStream();
-		        resposta = this.readIn(is, 200);
+		        resposta = this.readIn(is);
+
 		        
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (IOException ie) {
 				ie.printStackTrace();
-			} finally {
+			}
+			finally {
 				if(is != null)
 					try {
 						is.close();
@@ -157,18 +168,32 @@ public class MainActivity extends Activity {
 			out.close();
 		}
 		
-		private String readIn(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+		private String readIn(InputStream stream) throws IOException, UnsupportedEncodingException {
 			
-		    final Reader reader = new InputStreamReader(stream, "UTF-8");        
-		    char[] buffer = new char[len];
-		    reader.read(buffer);
-		    
-		    return new String(buffer);
+		    final Reader reader = new InputStreamReader(stream, "UTF-8");
+			//https://www.learn2crack.com/2013/11/listview-from-json-example.html
+			try {
+				BufferedReader br = new BufferedReader(reader);
+				StringBuilder sb = new StringBuilder();
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					sb.append(line + "n");
+				}
+				return sb.toString();
+			}catch(Exception e) {
+				Log.e("Buffer Error", "Error converting result " + e.toString());
+				return null;
+			}
 		}
 		
 		@Override
 		protected void onPostExecute(String result) { // Recebe a saida do doInBackground()
-			
+			JSONObject jObj;
+			try {
+				jObj = new JSONObject(result);
+			}catch (JSONException je){
+				Log.e("JSON Parser", "Error parsing data " + je.toString());
+			}
 			MainActivity.this.escondeAviso();
 			
 			MainActivity.this.setSaida(result);
