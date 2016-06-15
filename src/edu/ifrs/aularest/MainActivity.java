@@ -70,13 +70,14 @@ public class MainActivity extends Activity {
 
     public void fazAcessoRest(View v) {
 
-        final EditText campo = (EditText) this.findViewById(R.id.edtNome);
+        //final EditText campo = (EditText) this.findViewById(R.id.edtNome);
+        /*
         if (campo != null) {
 
             stLeitura = campo.getText().toString();
         }
-
-        if (stLeitura != null) {
+*/
+        if (stLeitura == null) {
 
             final ConnectivityManager cmgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
             final NetworkInfo netinfo = cmgr.getActiveNetworkInfo();
@@ -111,11 +112,12 @@ public class MainActivity extends Activity {
     }
 
     public void setSaida(String texto) {
-        final EditText campo = (EditText) this.findViewById(R.id.edtNome);
+        //final EditText campo = (EditText) this.findViewById(R.id.edtNome);
         //final TextView saida = (TextView) this.findViewById(R.id.txtSaida);
         //saida.setText(texto);
-        campo.setText(texto);
+        //campo.setText(texto);
     }
+
 
     private class AcessoRestTask extends AsyncTask<String, Void, String> {
 
@@ -210,7 +212,6 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String result) { // Recebe a saida do doInBackground()
             JSONArray ja;
             JSONObject jo;
-            JSONArrayAdapter jaa;
             List<Map<String, String>> l;
             //ArrayAdapter<String> aa = new ArrayAdapter<String>(MainActivity.this,
             //                android.R.layout.simple_expandable_list_item_1);

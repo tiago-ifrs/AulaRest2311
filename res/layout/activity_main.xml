@@ -8,17 +8,12 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="edu.ifrs.aularest.MainActivity" >
-    
-    <EditText android:id="@+id/edtNome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLength="30"
-        android:hint="@string/hint_nome" />
+
     
     <Button android:id="@+id/btnVai"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edtNome"
+
         android:text="Vai!"
         android:onClick="fazAcessoRest" />
     
