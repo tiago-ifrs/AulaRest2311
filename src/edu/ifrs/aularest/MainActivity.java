@@ -1,5 +1,28 @@
 package edu.ifrs.aularest;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.example.aularest2311dama.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,50 +35,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.sql.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.example.aularest2311dama.R;
-
-import android.app.Activity;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.ifrs.modelo.Leitura;
 
 public class MainActivity extends Activity {
 
     // http://developer.android.com/tools/devices/emulator.html#networkaddresses
-    //private static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
     private final static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
     private final static String SERVICE_LEITURA = SERVICE_RAIZ + "entidades.leitura";
-    private final static String SERVICE_DADO = SERVICE_RAIZ + "entidades.dado";
+    //private final static String SERVICE_DADO = SERVICE_RAIZ + "entidades.dado";
     ListView lvLeituras;
     LeituraAdapter leituraAdapter;
-    ArrayList<Leitura> leituras;
+    List<Leitura> leituraList;
+
     String stLeitura;
     Context c;
 
@@ -63,20 +57,27 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
-        lvLeituras = (ListView) findViewById(R.id.Lista);
         this.c = this;
+        leituraList = new ArrayList<Leitura>();
+        lvLeituras = (ListView) findViewById(R.id.Lista);
+        lvLeituras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Integer idLeitura = leituraList.get(position).getIdLeitura();
 
+                Toast toast = Toast.makeText(view.getContext(), idLeitura.toString(),
+                        Toast.LENGTH_LONG);
+                toast.show();
+                Intent intent = new Intent(MainActivity.this, DadoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("idLeitura", idLeitura);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 0);
+            }
+        });
     }
 
     public void fazAcessoRest(View v) {
-
-        //final EditText campo = (EditText) this.findViewById(R.id.edtNome);
-        /*
-        if (campo != null) {
-
-            stLeitura = campo.getText().toString();
-        }
-*/
         if (stLeitura == null) {
 
             final ConnectivityManager cmgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -212,25 +213,9 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String result) { // Recebe a saida do doInBackground()
             JSONArray ja;
             JSONObject jo;
-            List<Map<String, String>> l;
-            //ArrayAdapter<String> aa = new ArrayAdapter<String>(MainActivity.this,
-            //                android.R.layout.simple_expandable_list_item_1);
-            List<Leitura> leituraList = new ArrayList<Leitura>();
 
             try {
                 ja = new JSONArray(result);
-/*
-                ArrayList<String> items = new ArrayList<String>();
-                for(int i=0; i < ja.length() ; i++) {
-                    jo = ja.getJSONObject(i);
-                    int id=jo.getInt("idLeitura");
-                    String dataLeitura=jo.getString("dataLeitura");
-                    items.add(dataLeitura);
-                }
-                aa.addAll(items);
-                */
-
-
                 for (int i = 0; i < ja.length(); i++) {
                     jo = ja.getJSONObject(i);
                     Integer idLeitura = jo.getInt("idLeitura");
@@ -241,34 +226,12 @@ public class MainActivity extends Activity {
                     //se não tiver valor no campo, dá exceção
                     String descricao = null;
                     String ip = jo.getString("ip");
-                    //public Leitura(Integer idLeitura, Date dataLeitura, int quantidadeSensores, float intervaloEntreAmostras, String descricao, String ip) {
                     Leitura lei = new Leitura(idLeitura, dataLeitura, quantidadeSensores, intervaloEntreAmostras, descricao, ip);
 
                     leituraList.add(lei);
                 }
-
-                //setContentView(R.layout.listitems);
-                //contextList = this;
-                leituraAdapter=new LeituraAdapter(c,leituraList);
+                leituraAdapter = new LeituraAdapter(c, leituraList);
                 lvLeituras.setAdapter(leituraAdapter);
-
-
-                //View header = (View)getLayoutInflater().inflate(R.layout.listitems, null);
-                //lista.addHeaderView(header);
-                //LeituraAdapter la = new LeituraAdapter(getApplicationContext(),leituraList);
-                //leituraAdapter.setItems(leituraList);
-                //Log.e("JSON Parser", "Error parsing data " + je.toString());
-
-                //leituraAdapter.notifyDataSetChanged();
-
-
-                //lista.setChoiceMode(1);
-                //lista.setAdapter(aa);
-
-                //jaa = new JSONArrayAdapter(MainActivity.this, ja,-1,
-                //        new String[]{"dataLeitura", "idLeitura", "ip", "intervaloEntreAmostras", "quantidadeSensores"},
-                //        );
-
             } catch (JSONException je) {
                 Log.e("JSON Parser", "Error parsing data " + je.toString());
             }
