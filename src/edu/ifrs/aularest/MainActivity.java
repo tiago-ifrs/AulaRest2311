@@ -36,16 +36,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import edu.ifrs.Atividades.Atividade;
 import edu.ifrs.modelo.Leitura;
+import edu.ifrs.rest.AcessoLeitura;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Atividade {
 
     // http://developer.android.com/tools/devices/emulator.html#networkaddresses
     private final static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
     private final static String SERVICE_LEITURA = SERVICE_RAIZ + "entidades.leitura";
-    //private final static String SERVICE_DADO = SERVICE_RAIZ + "entidades.dado";
     ListView lvLeituras;
     LeituraAdapter leituraAdapter;
     List<Leitura> leituraList;
@@ -84,8 +84,8 @@ public class MainActivity extends Activity {
             final NetworkInfo netinfo = cmgr.getActiveNetworkInfo();
 
             if (netinfo != null && netinfo.isConnected()) {
-
-                new AcessoRestTask().execute(SERVICE_LEITURA, stLeitura);
+//public AcessoLeitura(Atividade atividade, List leituraList, LeituraAdapter leituraAdapter, ListView listView)
+                new AcessoLeitura(MainActivity.this, leituraList, leituraAdapter, lvLeituras).execute(SERVICE_LEITURA, stLeitura);
 
             } else {
 
@@ -119,129 +119,6 @@ public class MainActivity extends Activity {
         //campo.setText(texto);
     }
 
-
-    private class AcessoRestTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-
-            super.onPreExecute();
-
-            MainActivity.this.mostraAviso();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            final String servico = params[0];
-            final String nome = params[1];
-
-            InputStream is = null;
-            OutputStream os = null;
-            String resposta = null;
-
-            // Apenas para dar tempo de visualizar o aviso de aguardar:
-            try {
-                Thread.sleep(1000);
-                if (this.isCancelled()) return "";
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                final URL url = new URL(servico);
-                final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-//				conn.setReadTimeout(10000 /* milliseconds */);
-//		        conn.setConnectTimeout(15000 /* milliseconds */);
-//		        conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-//		        conn.setDoOutput(true);
-                conn.setChunkedStreamingMode(0);
-
-                conn.connect();
-
-//		        os = conn.getOutputStream();
-//		        this.writeOut(os, "user=" + nome);
-
-                is = conn.getInputStream();
-                resposta = this.readIn(is);
-
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException ie) {
-                ie.printStackTrace();
-            } finally {
-                if (is != null)
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-
-            return resposta;
-        }
-
-        private void writeOut(OutputStream stream, String postQuery) throws UnsupportedEncodingException {
-
-            final PrintWriter out = new PrintWriter(stream);
-            out.print(postQuery);
-            out.close();
-        }
-
-        private String readIn(InputStream stream) throws IOException, UnsupportedEncodingException {
-
-            final Reader reader = new InputStreamReader(stream, "UTF-8");
-            //https://www.learn2crack.com/2013/11/listview-from-json-example.html
-            try {
-                BufferedReader br = new BufferedReader(reader);
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "n");
-                }
-                return sb.toString();
-            } catch (Exception e) {
-                Log.e("Buffer Error", "Error converting result " + e.toString());
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) { // Recebe a saida do doInBackground()
-            JSONArray ja;
-            JSONObject jo;
-
-            try {
-                ja = new JSONArray(result);
-                for (int i = 0; i < ja.length(); i++) {
-                    jo = ja.getJSONObject(i);
-                    Integer idLeitura = jo.getInt("idLeitura");
-                    String dataLeitura = jo.getString("dataLeitura");
-                    int quantidadeSensores = jo.getInt("quantidadeSensores");
-                    float intervaloEntreAmostras = (float) jo.getDouble("intervaloEntreAmostras");
-                    //String descricao=jo.getString("descricao");
-                    //se não tiver valor no campo, dá exceção
-                    String descricao = null;
-                    String ip = jo.getString("ip");
-                    Leitura lei = new Leitura(idLeitura, dataLeitura, quantidadeSensores, intervaloEntreAmostras, descricao, ip);
-
-                    leituraList.add(lei);
-                }
-                leituraAdapter = new LeituraAdapter(c, leituraList);
-                lvLeituras.setAdapter(leituraAdapter);
-            } catch (JSONException je) {
-                Log.e("JSON Parser", "Error parsing data " + je.toString());
-            }
-            MainActivity.this.escondeAviso();
-
-            MainActivity.this.setSaida(result);
-
-            super.onPostExecute(result);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
