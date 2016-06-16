@@ -1,16 +1,24 @@
 package edu.ifrs.rest;
 
-import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.example.aularest2311dama.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.ifrs.Atividades.Atividade;
+import edu.ifrs.aularest.DadoActivity;
 import edu.ifrs.aularest.LeituraAdapter;
 import edu.ifrs.modelo.Leitura;
 
@@ -18,23 +26,33 @@ import edu.ifrs.modelo.Leitura;
  * Created by ti on 15/06/16.
  */
 public class AcessoLeitura extends AcessoRestTask{
-    Context context;
-    List leituraList;
-    LeituraAdapter leituraAdapter;
-    ListView listView;
-
-    public AcessoLeitura(Atividade atividade, List leituraList, LeituraAdapter leituraAdapter, ListView listView) {
+    public AcessoLeitura(Atividade atividade){
         super(atividade);
-        this.context = atividade.getApplicationContext();
-        this.leituraList = leituraList;
-        this.leituraAdapter = leituraAdapter;
-        this.listView = listView;
     }
-
     @Override
     protected void onPostExecute(String result) { // Recebe a saida do doInBackground()
         JSONArray ja;
         JSONObject jo;
+
+        List<Leitura> leituraList = new ArrayList<Leitura>();;
+        LeituraAdapter leituraAdapter;
+        ListView listView = (ListView) atividade.findViewById(R.id.Lista);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Integer idLeitura = leituraList.get(position).getIdLeitura();
+
+                Toast toast = Toast.makeText(view.getContext(), idLeitura.toString(),
+                        Toast.LENGTH_LONG);
+                toast.show();
+                Intent intent = new Intent(atividade, DadoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("idLeitura", idLeitura);
+                intent.putExtras(bundle);
+                atividade.startActivityForResult(intent, 0);
+            }
+        });
 
         try {
             ja = new JSONArray(result);
@@ -59,7 +77,5 @@ public class AcessoLeitura extends AcessoRestTask{
         }
         atividade.escondeAviso();
         atividade.setSaida(result);
-
-        //super.onPostExecute(result);
     }
 }

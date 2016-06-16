@@ -9,21 +9,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="edu.ifrs.aularest.MainActivity" >
 
-    
-    <Button android:id="@+id/btnVai"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:text="Vai!"
-        android:onClick="fazAcessoRest" />
-    
     <RelativeLayout android:id="@+id/avisoWait"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_below="@id/btnVai"
         android:background="@android:color/holo_green_light"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <ProgressBar android:id="@+id/progWait"
             android:layout_width="wrap_content"
@@ -47,12 +38,11 @@
         <ListView
             android:id="@+id/Lista"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_dark"
         >
         </ListView>
 
  </RelativeLayout>
-
 
 </RelativeLayout>

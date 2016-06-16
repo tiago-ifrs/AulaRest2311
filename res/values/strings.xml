@@ -6,5 +6,11 @@
     <string name="action_settings">Settings</string>
     <string name="DadoActivity">Dado</string>
     <string name="hint_nome">Nome</string>
+    <string name="lbIdLeitura"> </string>
+    <string name="lbData">Data: </string>
+    <string name="lbIp">IP: </string>
+    <string name="lbIdDado"> </string>
+    <string name="lbSensor">Sensor: </string>
+    <string name="lbValor">Valor: </string>
 
 </resources>
