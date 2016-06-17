@@ -21,7 +21,7 @@ import edu.ifrs.Atividades.Atividade;
 public class AcessoRestTask extends AsyncTask<String, Void, String> {
     Context context;
     Atividade atividade;
-    public AcessoRestTask(Atividade atividade){
+    public AcessoRestTask(Atividade atividade)    {
         this.atividade = atividade;
     }
 
@@ -35,6 +35,7 @@ public class AcessoRestTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... params) {
         final String servico = params[0];
+        Log.e("serviço:",servico);
 
         InputStream is = null;
         String resposta = null;

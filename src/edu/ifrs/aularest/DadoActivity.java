@@ -18,17 +18,17 @@ import edu.ifrs.rest.AcessoDado;
 
 public class DadoActivity extends Atividade {
     // http://developer.android.com/tools/devices/emulator.html#networkaddresses
-    private final static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
-    private final static String SERVICE_DADO = SERVICE_RAIZ + "entidades.dado/idLeitura/";
-//    ListView lvDados;
+//    private final static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
+//   private final static String SERVICE_DADO = SERVICE_RAIZ + "entidades.dado/idLeitura/";
+    private static String SERVICE_DADO;
     Integer idLeitura;
     String stLeitura;
-    //Context c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
+        SERVICE_DADO = getString(R.string.raiz) + "entidades.dado/idLeitura/";
         //this.c = this;
         Bundle bundle = getIntent().getExtras();
         idLeitura = bundle.getInt("idLeitura");

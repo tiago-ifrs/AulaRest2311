@@ -1,9 +1,11 @@
 package edu.ifrs.aularest;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,8 +18,9 @@ import edu.ifrs.rest.AcessoLeitura;
 
 public class MainActivity extends Atividade {
     // http://developer.android.com/tools/devices/emulator.html#networkaddresses
-    private final static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
-    private final static String SERVICE_LEITURA = SERVICE_RAIZ + "entidades.leitura";
+    //private final static String SERVICE_RAIZ = "http://10.0.2.2:8080/ServicoEnvioMysql/webresources/";
+    //private final static String SERVICE_LEITURA = SERVICE_RAIZ + "entidades.leitura";
+    private static String SERVICE_LEITURA;
 
     String stLeitura;
 
@@ -25,6 +28,7 @@ public class MainActivity extends Atividade {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
+        SERVICE_LEITURA =  getString(R.string.raiz) + "entidades.leitura";
         fazAcessoRest();
     }
 
@@ -34,6 +38,7 @@ public class MainActivity extends Atividade {
             final NetworkInfo netinfo = cmgr.getActiveNetworkInfo();
 
             if (netinfo != null && netinfo.isConnected()) {
+                Log.e("main", SERVICE_LEITURA);
                 new AcessoLeitura(MainActivity.this).execute(SERVICE_LEITURA, stLeitura);
             } else {
                 this.setSaida("** Erro de conexao **");

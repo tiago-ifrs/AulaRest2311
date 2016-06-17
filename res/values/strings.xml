@@ -12,5 +12,5 @@
     <string name="lbIdDado"> </string>
     <string name="lbSensor">Sensor: </string>
     <string name="lbValor">Valor: </string>
-
+    <string name="raiz">http://200.132.50.78:8080/ServicoEnvioMysql/webresources/</string>
 </resources>
