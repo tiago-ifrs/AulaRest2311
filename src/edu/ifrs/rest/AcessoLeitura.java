@@ -34,7 +34,7 @@ public class AcessoLeitura extends AcessoRestTask{
         JSONArray ja;
         JSONObject jo;
 
-        List<Leitura> leituraList = new ArrayList<Leitura>();;
+        final List<Leitura> leituraList = new ArrayList<Leitura>();;
         LeituraAdapter leituraAdapter;
         ListView listView = (ListView) atividade.findViewById(R.id.Lista);
 
